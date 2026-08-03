@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Painting Reference Generator</p>
+        <h1>Reference Studio</h1>
+      </div>
+      <div class="header-actions" aria-label="Global actions">
+        <button class="ghost-button" type="button" id="shuffleButton">Shuffle</button>
+        <button class="ghost-button" type="button" id="resetButton">Reset</button>
+      </div>
+    </header>
+
+    <nav class="workflow-tabs" role="tablist" aria-label="Reference workflow">
+      <button
+        class="workflow-tab is-active"
+        type="button"
+        role="tab"
+        aria-selected="true"
+        aria-controls="generatorView"
+        data-workflow-tab="generator"
+      >
+        Generate from criteria
+      </button>
+      <button
+        class="workflow-tab"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        aria-controls="uploadView"
+        data-workflow-tab="upload"
+      >
+        Work from photos
+      </button>
+    </nav>
+
+    <main class="app-shell workflow-view" id="generatorView" data-workflow-view="generator">
+      <aside class="control-panel" aria-label="Generator controls">
+        <form id="generatorForm">
+          <section class="control-group">
+            <div class="group-title">
+              <span>Subject</span>
+              <small id="subjectCount"></small>
+            </div>
+            <div class="choice-grid" id="subjectGrid" data-choice-group="subject"></div>
+            <label class="guide-toggle" for="showAllOptionsToggle">
+              <input id="showAllOptionsToggle" type="checkbox" />
+              <span>Show all options</span>
+            </label>
+            <p class="guide-note" id="compatibilityStatus">Guided choices for portrait</p>
+          </section>
+
+          <section class="control-group">
+            <div class="group-title">
+              <span>Painting Approach</span>
+              <small id="styleCount"></small>
+            </div>
+            <div class="choice-grid compact" id="styleGrid" data-choice-group="style"></div>
+          </section>
+
+          <section class="control-group">
+            <div class="group-title">
+              <span>Starting Points</span>
+              <small id="presetCount"></small>
+            </div>
+            <div class="preset-grid" id="presetGrid"></div>
+          </section>
+
+          <section class="control-group control-grid">
+            <label>
+              <span>Purpose</span>
+              <select id="purposeSelect">
+                <option>Finished painting</option>
+                <option>Study</option>
+                <option>Composition exploration</option>
+                <option>Color study</option>
+                <option>Lighting study</option>
+                <option>Anatomy study</option>
+              </select>
+            </label>
+            <label>
+              <span>Lighting</span>
+              <select id="lightingSelect">
+                <option>Warm window light from the left</option>
+                <option>Dramatic side light</option>
+                <option>Soft north-light studio</option>
+                <option>Golden hour backlight</option>
+                <option>Overcast diffused light</option>
+                <option>Candlelight</option>
+                <option>High-key studio light</option>
+                <option>Low-key chiaroscuro</option>
+              </select>
+            </label>
+            <label>
+              <span>Mood</span>
+              <select id="moodSelect">
+                <option>Quiet and contemplative</option>
+                <option>Calm</option>
+                <option>Dramatic</option>
+                <option>Intimate</option>
+                <option>Bright</option>
+                <option>Melancholic</option>
+                <option>Mysterious</option>
+                <option>Energetic</option>
+              </select>
+            </label>
+            <label>
+              <span>Composition</span>
+              <select id="compositionSelect">
+                <option>Three-quarter crop</option>
+                <option>Close-up</option>
+                <option>Half-body</option>
+                <option>Full-body</option>
+                <option>Wide scene</option>
+                <option>Asymmetrical crop</option>
+                <option>Spacious negative space</option>
+                <option>Tight observational crop</option>
+              </select>
+            </label>
+            <label>
+              <span>Camera Angle</span>
+              <select id="cameraSelect">
+                <option>Eye level</option>
+                <option>Low angle</option>
+                <option>High angle</option>
+                <option>Top-down</option>
+                <option>Three-quarter view</option>
+                <option>Profile view</option>
+              </select>
+            </label>
+            <label>
+              <span>Color</span>
+              <select id="colorSelect">
+                <option>Natural muted color</option>
+                <option>Limited warm palette</option>
+                <option>Cool shadows with warm lights</option>
+                <option>High chroma accents</option>
+                <option>Earth pigments</option>
+                <option>Complementary contrast</option>
+              </select>
+            </label>
+            <label>
+              <span>Pose / Motion</span>
+              <select id="poseSelect">
+                <option>Still and natural</option>
+                <option>Gentle gesture</option>
+                <option>Dynamic action</option>
+                <option>Resting pose</option>
+                <option>Contrapposto</option>
+                <option>Object-focused arrangement</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="control-group">
+            <div class="range-block">
+              <label class="range-label" for="detailRange">
+                <span>Detail</span>
+                <strong data-range-output="detailRange">Balanced</strong>
+              </label>
+              <input id="detailRange" type="range" min="0" max="2" step="1" value="1" />
+            </div>
+            <div class="range-block">
+              <label class="range-label" for="contrastRange">
+                <span>Value Contrast</span>
+                <strong data-range-output="contrastRange">Dramatic</strong>
+              </label>
+              <input id="contrastRange" type="range" min="0" max="2" step="1" value="2" />
+            </div>
+            <div class="range-block">
+              <label class="range-label" for="backgroundRange">
+                <span>Background</span>
+                <strong data-range-output="backgroundRange">Suggested</strong>
+              </label>
+              <input id="backgroundRange" type="range" min="0" max="2" step="1" value="1" />
+            </div>
+            <div class="range-block">
+              <label class="range-label" for="abstractionRange">
+                <span>Abstraction</span>
+                <strong data-range-output="abstractionRange">Literal</strong>
+              </label>
+              <input id="abstractionRange" type="range" min="0" max="2" step="1" value="0" />
+            </div>
+          </section>
+
+          <section class="control-group">
+            <label for="requirementsInput">
+              <span>Additional Requirements</span>
+              <textarea
+                id="requirementsInput"
+                rows="5"
+                placeholder="Optional: profile view, hands visible, simple dark background, warm window light"
+              ></textarea>
+            </label>
+          </section>
+
+          <section class="control-group guardrails">
+            <div class="group-title">
+              <span>Guardrails</span>
+            </div>
+            <label class="check-row">
+              <input type="checkbox" value="accurate anatomy when people or animals are involved" checked />
+              <span>Accurate anatomy</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" value="clear paintable value structure" checked />
+              <span>Clear values</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" value="no text, logos, or watermarks" checked />
+              <span>No text or logos</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" value="avoid unnecessary background clutter" checked />
+              <span>Simple background</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" value="coherent perspective and spatial relationships" checked />
+              <span>Perspective</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" value="avoid overly polished AI look" checked />
+              <span>Natural finish</span>
+            </label>
+          </section>
+
+          <button class="primary-button" type="submit" id="generateButton">Generate Reference</button>
+          <p class="generate-notice" id="generateNotice">Ready</p>
+        </form>
+      </aside>
+
+      <section class="workspace" aria-label="Reference output">
+        <div class="workspace-header">
+          <div>
+            <p class="eyebrow">Primary Reference</p>
+            <h2 id="resultTitle">Traditional portrait for finished painting</h2>
+          </div>
+          <div class="tool-actions" aria-label="Reference actions">
+            <button type="button" id="copyPromptButton">Copy Prompt</button>
+            <button type="button" id="downloadButton">Download Image</button>
+            <button type="button" id="exportButton">Export Brief</button>
+            <button type="button" id="saveButton">Save</button>
+          </div>
+        </div>
+
+        <div class="reference-layout">
+          <div class="preview-stage">
+            <canvas id="studyCanvas" width="768" height="1152" aria-label="Generated reference preview"></canvas>
+            <span class="mode-badge" id="modeBadge">Original</span>
+          </div>
+
+          <div class="study-tools">
+            <div class="tabs" role="tablist" aria-label="Study modes">
+              <button type="button" class="tab-button is-active" data-mode="original">Original</button>
+              <button type="button" class="tab-button" data-mode="value">Value</button>
+              <button type="button" class="tab-button" data-mode="shape">Shape</button>
+              <button type="button" class="tab-button" data-mode="contour">Contour</button>
+            </div>
+
+            <div class="score-panel">
+              <div class="score-ring" id="paintabilityScore">92</div>
+              <div>
+                <span>Paintability</span>
+                <strong id="scoreLabel">Strong reference</strong>
+              </div>
+            </div>
+            <div class="score-breakdown" id="scoreBreakdown" aria-label="Paintability breakdown">
+              <div class="score-row" data-paintability-row="value">
+                <span>Value</span>
+                <div class="score-track"><i></i></div>
+                <strong>--</strong>
+              </div>
+              <div class="score-row" data-paintability-row="clarity">
+                <span>Clarity</span>
+                <div class="score-track"><i></i></div>
+                <strong>--</strong>
+              </div>
+              <div class="score-row" data-paintability-row="composition">
+                <span>Composition</span>
+                <div class="score-track"><i></i></div>
+                <strong>--</strong>
+              </div>
+              <div class="score-row" data-paintability-row="color">
+                <span>Color</span>
+                <div class="score-track"><i></i></div>
+                <strong>--</strong>
+              </div>
+            </div>
+
+            <dl class="metric-list">
+              <div>
+                <dt>Light</dt>
+                <dd id="lightMetric">Warm window light from the left</dd>
+              </div>
+              <div>
+                <dt>Value</dt>
+                <dd id="valueMetric">Dramatic</dd>
+              </div>
+              <div>
+                <dt>Detail</dt>
+                <dd id="detailMetric">Balanced</dd>
+              </div>
+              <div>
+                <dt>Color</dt>
+                <dd id="colorMetric">Natural muted color</dd>
+              </div>
+              <div>
+                <dt>Angle</dt>
+                <dd id="cameraMetric">Eye level</dd>
+              </div>
+              <div>
+                <dt>Mood</dt>
+                <dd id="moodMetric">Quiet and contemplative</dd>
+              </div>
+            </dl>
+
+            <div class="palette-panel">
+              <div class="group-title">
+                <span>Palette</span>
+                <small id="paletteName">Traditional warm neutrals</small>
+              </div>
+              <div class="swatch-row" id="paletteSwatches" aria-label="Suggested palette"></div>
+            </div>
+
+            <div class="brief-panel">
+              <div class="group-title">
+                <span>Reference Brief</span>
+              </div>
+              <ul class="brief-list" id="briefList"></ul>
+            </div>
+          </div>
+        </div>
+
+        <section class="prompt-panel">
+          <label for="promptOutput">
+            <span>Prompt Summary</span>
+            <textarea id="promptOutput" rows="7" readonly></textarea>
+          </label>
+        </section>
+
+        <section class="variation-section" aria-label="Reference variations">
+          <div class="section-title">
+            <h3>Variations</h3>
+            <span id="generationStatus">Ready</span>
+          </div>
+          <div class="variation-grid">
+            <button class="variation-card" type="button" data-variation="lighting">
+              <div class="variation-preview">
+                <img alt="Lighting variation preview" hidden />
+                <span class="variation-placeholder">Generate main reference first</span>
+              </div>
+              <span class="variation-label">Darker shadow side</span>
+              <small class="variation-state">Waiting for main reference</small>
+            </button>
+            <button class="variation-card" type="button" data-variation="palette">
+              <div class="variation-preview">
+                <img alt="Palette variation preview" hidden />
+                <span class="variation-placeholder">Generate main reference first</span>
+              </div>
+              <span class="variation-label">Muted palette</span>
+              <small class="variation-state">Waiting for main reference</small>
+            </button>
+            <button class="variation-card" type="button" data-variation="background">
+              <div class="variation-preview">
+                <img alt="Background variation preview" hidden />
+                <span class="variation-placeholder">Generate main reference first</span>
+              </div>
+              <span class="variation-label">Simpler background</span>
+              <small class="variation-state">Waiting for main reference</small>
+            </button>
+            <button class="variation-card" type="button" data-variation="composition">
+              <div class="variation-preview">
+                <img alt="Composition variation preview" hidden />
+                <span class="variation-placeholder">Generate main reference first</span>
+              </div>
+              <span class="variation-label">New crop</span>
+              <small class="variation-state">Waiting for main reference</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="saved-section" aria-label="Saved references">
+          <div class="section-title">
+            <h3>Saved References</h3>
+            <button class="text-button" type="button" id="clearSavedButton">Clear</button>
+          </div>
+          <div class="saved-grid" id="savedGrid"></div>
+        </section>
+      </section>
+    </main>
+
+    <main class="upload-shell workflow-view" id="uploadView" data-workflow-view="upload" hidden>
+      <aside class="control-panel upload-control-panel" aria-label="Uploaded photo controls">
+        <form id="uploadForm">
+          <section class="control-group">
+            <div class="group-title">
+              <span>Source Photos</span>
+              <small id="uploadCount">0 selected</small>
+            </div>
+            <label class="upload-dropzone" for="photoUploadInput">
+              <input id="photoUploadInput" type="file" accept="image/png,image/jpeg,image/webp" multiple />
+              <strong>Choose photo files</strong>
+              <span>Use one or more photos as visual anchors for a new similar reference.</span>
+            </label>
+            <div class="upload-source-grid" id="uploadPhotoGrid"></div>
+            <button class="text-button clear-upload-button" type="button" id="clearUploadButton">Clear photos</button>
+          </section>
+
+          <section class="control-group control-grid">
+            <label>
+              <span>Output Shape</span>
+              <select id="uploadSizeSelect">
+                <option value="auto">Auto</option>
+                <option value="1024x1024">Square</option>
+                <option value="1024x1536">Portrait</option>
+                <option value="1536x1024">Landscape</option>
+              </select>
+            </label>
+            <label>
+              <span>Source Match</span>
+              <select id="uploadFidelitySelect">
+                <option value="high">High</option>
+                <option value="low">Loose</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="control-group">
+            <label for="uploadRequirementsInput">
+              <span>Reference Notes</span>
+              <textarea
+                id="uploadRequirementsInput"
+                rows="6"
+                placeholder="Optional: keep the pose, similar light, simpler shapes, quieter background, more useful value structure"
+              ></textarea>
+            </label>
+          </section>
+
+          <button class="primary-button" type="submit" id="uploadGenerateButton">Generate Similar Photo</button>
+          <p class="generate-notice" id="uploadNotice">Upload one or more photos to begin</p>
+        </form>
+      </aside>
+
+      <section class="upload-workspace" aria-label="Uploaded photo output">
+        <div class="workspace-header">
+          <div>
+            <p class="eyebrow">Photo Reference Workspace</p>
+            <h2 id="uploadResultTitle">Upload photos for a similar reference</h2>
+          </div>
+          <div class="tool-actions" aria-label="Uploaded photo actions">
+            <button type="button" id="copyUploadPromptButton">Copy Prompt</button>
+            <button type="button" id="downloadUploadButton">Download Result</button>
+            <button type="button" id="useUploadResultButton">Use As Reference</button>
+          </div>
+        </div>
+
+        <div class="upload-layout">
+          <section class="upload-preview-panel" aria-label="Uploaded sources">
+            <div class="section-title">
+              <h3>Sources</h3>
+              <span id="uploadSourceSummary">No photos selected</span>
+            </div>
+            <div class="upload-large-grid" id="uploadLargeGrid"></div>
+          </section>
+
+          <section class="upload-result-panel" aria-label="Generated uploaded photo result">
+            <div class="upload-result-stage">
+              <img id="uploadResultImage" alt="Generated result from uploaded photos" hidden />
+            </div>
+            <label for="uploadPromptOutput">
+              <span>Prompt Summary</span>
+              <textarea id="uploadPromptOutput" rows="9" readonly></textarea>
+            </label>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

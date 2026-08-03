@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Upload Feature Probe</title>
+  </head>
+  <body>
+    <iframe id="probeFrame" src="/index.html?test=upload-flow" style="width: 1280px; height: 1200px; border: 0"></iframe>
+    <pre id="output">waiting</pre>
+    <script>
+      const frame = document.querySelector("#probeFrame");
+      const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+      async function makePngFile(color, name) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const context = canvas.getContext("2d");
+        context.fillStyle = color;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        return new File([blob], name, { type: "image/png" });
+      }
+
+      async function waitUntil(check, timeout = 5000) {
+        const started = Date.now();
+        while (Date.now() - started < timeout) {
+          const result = check();
+          if (result) return result;
+          await wait(50);
+        }
+        return check();
+      }
+
+      frame.addEventListener("load", async () => {
+        const doc = frame.contentDocument;
+        const status = () => doc.querySelector("#uploadNotice").textContent;
+
+        doc.querySelector('[data-workflow-tab="upload"]').click();
+
+        const fileA = await makePngFile("#d84a2f", "red-cup.png");
+        const fileB = await makePngFile("#2f66d8", "blue-cloth.png");
+        const transfer = new DataTransfer();
+        transfer.items.add(fileA);
+        transfer.items.add(fileB);
+
+        const input = doc.querySelector("#photoUploadInput");
+        input.files = transfer.files;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        await waitUntil(() => doc.querySelectorAll("#uploadPhotoGrid .upload-thumb").length === 2);
+
+        doc.querySelector("#uploadRequirementsInput").value =
+          "keep the red cup color relationship, similar soft light, quieter shapes";
+        doc.querySelector("#uploadRequirementsInput").dispatchEvent(new Event("input", { bubbles: true }));
+        doc.querySelector("#uploadForm").requestSubmit();
+
+        await waitUntil(
+          () =>
+            status().includes("Generated similar reference") &&
+            !doc.querySelector("#uploadResultImage").hidden &&
+            doc.querySelector("#uploadResultImage").src.startsWith("data:image/png;base64,"),
+          10000,
+        );
+
+        const requestLog = await fetch("/test/requests").then((response) => response.json());
+        const requestPayload = requestLog[0];
+        const output = {
+          activeTab: doc.querySelector('[data-workflow-tab="upload"]').getAttribute("aria-selected"),
+          photoCount: doc.querySelectorAll("#uploadPhotoGrid .upload-thumb").length,
+          status: status(),
+          resultVisible: !doc.querySelector("#uploadResultImage").hidden,
+          removedControlsPresent: Boolean(
+            doc.querySelector('[data-upload-operation], #exactBackgroundGroup, #uploadRefineCanvas, #cutoutRefinePanel'),
+          ),
+          prompt: doc.querySelector("#uploadPromptOutput").value,
+          requestCount: requestLog.length,
+          requestPayload: {
+            uploadOperation: requestPayload.uploadOperation,
+            sourceCount: requestPayload.sourceImageDataUrls.length,
+            hasLegacySource: Boolean(requestPayload.sourceImageDataUrl),
+            size: requestPayload.size,
+            inputFidelity: requestPayload.inputFidelity,
+            settings: requestPayload.settings,
+            prompt: requestPayload.prompt,
+          },
+        };
+
+        document.querySelector("#output").textContent = JSON.stringify(output, null, 2);
+      });
+    </script>
+  </body>
+</html>
