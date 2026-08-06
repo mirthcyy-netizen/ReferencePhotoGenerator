@@ -13,7 +13,10 @@ The current prototype is a local web app called **Reference Studio**. It helps a
 - The backend is `server.py`, using Python standard library HTTP handling.
 - The intended local URL is `http://127.0.0.1:5174`.
 - The backend exposes `/api/generate` for image generation and `/api/status` for secret-safe API key status checks.
+- Vercel deployment uses Python functions in `api/generate.py` and `api/status.py` to provide those same API routes.
+- `vercel.json` configures the Python functions with a longer maximum duration for image generation.
 - Environment setup uses a local `.env` file in the `ReferencePhotoGen` folder.
+- Production deployment must use Vercel project environment variables for secrets such as `OPENAI_API_KEY`; secrets must not be committed to GitHub.
 - `scripts/create-env.sh` helps create `.env` securely and writes the API key with restricted file permissions.
 
 ### OpenAI Image Generation
@@ -24,6 +27,7 @@ The current prototype is a local web app called **Reference Studio**. It helps a
 - The default image model is `gpt-image-1`.
 - The default image quality is `medium`.
 - The API key is read from `OPENAI_API_KEY` or from `.env`.
+- On Vercel, `OPENAI_API_KEY` is read from the project environment variables.
 - The server can re-read `.env` if the file is added or corrected after the server starts.
 - `/api/status` reports whether an API key is configured without exposing the key.
 
@@ -187,6 +191,9 @@ Use this section as the implementation brief for rebuilding the current app beha
 - `styles.css`: responsive visual design and layout.
 - `app.js`: frontend data catalogs, prompt builder, image rendering, palette extraction, paintability scoring, upload workflow, saved references.
 - `server.py`: local Python backend, `.env` loading, OpenAI image generation/edit requests.
+- `api/generate.py`: Vercel Python function for production `/api/generate`.
+- `api/status.py`: Vercel Python function for production `/api/status`.
+- `vercel.json`: Vercel function configuration.
 - `tests/test_generation_feature.py`: behavior contract tests.
 - `tests/browser_generate_probe.html`: browser probe for criteria-based generation.
 - `tests/browser_upload_probe.html`: browser probe for upload-based generation.

@@ -106,14 +106,26 @@ The tests cover prompt behavior, generation requests, upload-based similar refer
 
 ## Deployment Notes
 
-This prototype currently uses a simple Python backend that reads `OPENAI_API_KEY` from the server environment. For a public deployment, keep the key on the server only. Do not expose it in frontend code.
+This prototype includes Vercel Python functions for:
 
-A production deployment should provide:
+- `/api/generate`
+- `/api/status`
 
-- Static hosting for `index.html`, `styles.css`, `app.js`, and assets.
-- A backend endpoint compatible with `/api/generate`.
-- A backend status endpoint compatible with `/api/status`.
-- Secure environment-variable storage for `OPENAI_API_KEY`.
+For Vercel, add the OpenAI key as a project environment variable rather than committing it to GitHub:
+
+```text
+Name: OPENAI_API_KEY
+Environment: Production
+Value: your real OpenAI API key
+```
+
+You can add it in the Vercel dashboard under **Project Settings -> Environment Variables**, or with the Vercel CLI:
+
+```bash
+vercel env add OPENAI_API_KEY production --sensitive
+```
+
+After adding or changing an environment variable, redeploy the project. Vercel only applies environment-variable changes to new deployments.
 
 ## Product Plan
 

@@ -131,7 +131,7 @@ def generate_reference_image(payload):
     api_key = get_openai_api_key()
     if not api_key:
         raise MissingApiKeyError(
-            "Add a real OPENAI_API_KEY to .env in the ReferencePhotoGen folder, then restart the server to generate new reference photos."
+            "Set a real OPENAI_API_KEY in the server environment, or add it to .env for local development, then redeploy or restart the server."
         )
 
     prompt = str(payload.get("prompt", "")).strip()
@@ -248,7 +248,7 @@ def build_generation_prompt(prompt, request_id, source_image_count=0):
         )
     elif source_image_count > 1:
         instructions.append(
-            "Use the provided source photographs as visual anchors; combine or edit them only as the prompt requests, with coherent perspective, scale, lighting, and photographic realism."
+            "Use the provided source photographs as visual anchors for the similar reference request, with coherent perspective, scale, lighting, and photographic realism."
         )
 
     instructions.extend(
