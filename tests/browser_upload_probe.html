@@ -79,7 +79,7 @@
             sourceCount: requestPayload.sourceImageDataUrls.length,
             hasLegacySource: Boolean(requestPayload.sourceImageDataUrl),
             size: requestPayload.size,
-            inputFidelity: requestPayload.inputFidelity,
+            hasInputFidelity: Object.prototype.hasOwnProperty.call(requestPayload, "inputFidelity"),
             settings: requestPayload.settings,
             prompt: requestPayload.prompt,
           },

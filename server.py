@@ -52,7 +52,7 @@ HOST = os.environ.get("HOST", "127.0.0.1")
 PORT = int(os.environ.get("PORT", "5174"))
 OPENAI_IMAGES_ENDPOINT = "https://api.openai.com/v1/images/generations"
 OPENAI_IMAGE_EDITS_ENDPOINT = "https://api.openai.com/v1/images/edits"
-OPENAI_IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1")
+OPENAI_IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-2.5-sunburst")
 OPENAI_IMAGE_QUALITY = os.environ.get("OPENAI_IMAGE_QUALITY", "medium")
 OPENAI_TIMEOUT_SECONDS = int(os.environ.get("OPENAI_TIMEOUT_SECONDS", "180"))
 ALLOWED_IMAGE_SIZES = {"1024x1024", "1024x1536", "1536x1024", "auto"}
@@ -158,7 +158,6 @@ def generate_reference_image(payload):
     }
 
     if source_images:
-        openai_payload["input_fidelity"] = str(payload.get("inputFidelity", "high"))
         api_response = post_openai_multipart(api_key, openai_payload, source_images)
     else:
         api_response = post_openai_json(api_key, openai_payload)

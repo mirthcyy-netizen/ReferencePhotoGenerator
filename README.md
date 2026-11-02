@@ -58,7 +58,7 @@ Then edit `.env` and add your real key:
 
 ```text
 OPENAI_API_KEY=sk-your-real-key
-OPENAI_IMAGE_MODEL=gpt-image-1
+OPENAI_IMAGE_MODEL=gpt-image-2.5-sunburst
 OPENAI_IMAGE_QUALITY=medium
 OPENAI_TIMEOUT_SECONDS=180
 ```

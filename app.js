@@ -1182,6 +1182,10 @@ function buildUploadPrompt() {
   const operation = getUploadOperation();
   const photoCount = state.upload.photos.length;
   const requirements = elements.uploadRequirements.value.trim();
+  const sourceMatchLine =
+    elements.uploadFidelity.value === "high"
+      ? "Source match: closely preserve the uploaded photos' recognizable subjects, proportions, colors, and visual relationships."
+      : "Source match: use the uploaded photos as loose visual inspiration while allowing broader changes to composition and details.";
   const sourceSummary = photoCount
     ? state.upload.photos
         .map((photo, index) => `Source ${index + 1}: ${photo.name}, ${photo.width}x${photo.height}.`)
@@ -1196,6 +1200,7 @@ function buildUploadPrompt() {
     `Use ${photoCount || "the"} uploaded source photo${photoCount === 1 ? "" : "s"} as visual input.`,
     sourceSummary,
     operation.prompt,
+    sourceMatchLine,
     requirementLine,
     `Output priorities: realistic source photograph, clean readable value structure, believable color temperature, coherent perspective, useful edges, and enough detail to paint from.`,
     `Constraints: do not create a painting, illustration, sketch, concept art, render, or stylized artwork; no brushstrokes; no canvas texture; no watercolor, oil paint, ink, or pastel effect; no text, signature, logo, or watermark.`,
@@ -1233,7 +1238,6 @@ async function generateFromUploadedPhotos() {
         requestId,
         uploadOperation: state.upload.operation,
         sourceImageDataUrls: state.upload.photos.map((photo) => photo.dataUrl),
-        inputFidelity: elements.uploadFidelity.value,
       }),
     });
     const payload = await readJsonResponse(response);

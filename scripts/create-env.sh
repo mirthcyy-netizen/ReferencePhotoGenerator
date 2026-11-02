@@ -37,7 +37,7 @@ esac
 umask 077
 cat > "$ENV_FILE" <<EOF
 OPENAI_API_KEY=$trimmed_key
-OPENAI_IMAGE_MODEL=gpt-image-1
+OPENAI_IMAGE_MODEL=gpt-image-2.5-sunburst
 OPENAI_IMAGE_QUALITY=medium
 OPENAI_TIMEOUT_SECONDS=180
 EOF

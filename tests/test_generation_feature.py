@@ -255,11 +255,13 @@ class BrowserGenerateFlowTests(unittest.TestCase):
         self.assertEqual(request_payload["sourceCount"], 2)
         self.assertFalse(request_payload["hasLegacySource"])
         self.assertEqual(request_payload["size"], "auto")
-        self.assertEqual(request_payload["inputFidelity"], "high")
+        self.assertFalse(request_payload["hasInputFidelity"])
         self.assertEqual(request_payload["settings"]["sourcePhotoCount"], 2)
         self.assertEqual(request_payload["settings"]["uploadOperation"], "similar")
+        self.assertEqual(request_payload["settings"]["sourceMatch"], "high")
         self.assertIn("realistic reference photograph", request_payload["prompt"])
         self.assertIn("not create a painting", request_payload["prompt"])
+        self.assertIn("closely preserve", request_payload["prompt"])
 
 
 class ServerGenerationContractTests(unittest.TestCase):
@@ -400,7 +402,7 @@ class ServerGenerationContractTests(unittest.TestCase):
         filename, content_type, image_bytes = source_images[0]
         self.assertEqual(api_key, "test-key")
         self.assertEqual(payload["size"], "1024x1536")
-        self.assertEqual(payload["input_fidelity"], "high")
+        self.assertNotIn("input_fidelity", payload)
         self.assertIn("variation-123", payload["prompt"])
         self.assertIn("provided source photograph", payload["prompt"])
         self.assertIn("Do not create a painting", payload["prompt"])
@@ -438,7 +440,7 @@ class ServerGenerationContractTests(unittest.TestCase):
         api_key, payload, source_images = post_openai_multipart.call_args.args
         self.assertEqual(api_key, "test-key")
         self.assertEqual(payload["size"], "auto")
-        self.assertEqual(payload["input_fidelity"], "low")
+        self.assertNotIn("input_fidelity", payload)
         self.assertIn("upload-123", payload["prompt"])
         self.assertIn("provided source photographs", payload["prompt"])
         self.assertEqual(len(source_images), 2)
